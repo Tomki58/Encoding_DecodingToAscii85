@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Admin/CLionProjects/ASCII85_Encoding_Decoding/main.cpp
+iostream
+-
+bitset
+-
+c++/4.8.3/vector
+-
+c++/4.8.3/cmath
+-
+
