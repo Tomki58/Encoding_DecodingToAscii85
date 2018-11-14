@@ -2,6 +2,7 @@
 #include <bitset>
 #include <c++/4.8.3/vector>
 #include <c++/4.8.3/cmath>
+#include <c++/4.8.3/algorithm>
 
 std::string toAscii85(std::string inputString)
 {
@@ -38,12 +39,61 @@ std::string toAscii85(std::string inputString)
             power--;
         }
     }
-    resultString.erase(resultString.end() - addBytes, resultString.end());
+    if (addBytes != 4)
+        resultString.erase(resultString.end() - addBytes, resultString.end());
+    return resultString;
+}
+
+std::string fromAscii85(std::string inputString)
+{
+    std::vector<long> fiveLetters;
+
+    std::string resultString;
+
+    int addBytes = 5 - inputString.length() % 5;
+    if (addBytes != 5)
+    {
+        for (int i {0}; i < addBytes; i++, inputString += 'u');
+    }
+    auto ptr = inputString.begin();
+    while (ptr != inputString.end())
+    {
+        std::string subString = inputString.substr(static_cast<unsigned int>(ptr - inputString.begin()), 5);
+        unsigned long bufLong = 0;
+        int initPow = 4;
+        for (auto iter : subString)
+        {
+            bufLong += ((int)(iter) - 33) * pow(85, initPow--);
+        }
+        ptr += 5;
+        fiveLetters.emplace_back(bufLong);
+    }
+
+    for (const auto& num : fiveLetters)
+    {
+        std::bitset<32> currBitset (num);
+        std::bitset<32> divider {"00000000000000000000000011111111"};
+        int counter {0};
+        std::string bufString;
+        while (counter != 4)
+        {
+            auto letter = (currBitset & divider).to_ulong();
+            currBitset = currBitset >> 8;
+            bufString += static_cast<char>(letter);
+            counter++;
+        }
+        std::reverse(bufString.begin(), bufString.end());
+        resultString += bufString;
+    }
+
+    if (addBytes != 5)
+        resultString.erase(resultString.end() - addBytes, resultString.end());
+
     return resultString;
 }
 
 int main()
 {
-    std::cout << toAscii85("Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.");
+    std::cout << fromAscii85(toAscii85("Type text here or create string."));
     return 0;
 }
